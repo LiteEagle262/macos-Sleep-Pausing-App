@@ -1,0 +1,21 @@
+name: Build and test
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test core and real power assertion
+        run: ./scripts/test.sh
+      - name: Run XCTest suite
+        run: swift test
+      - name: Build universal app
+        run: ./scripts/build-app.sh
+      - name: Verify architectures
+        run: lipo -verify_arch arm64 x86_64 'dist/Sleep Pause.app/Contents/MacOS/SleepPause'
